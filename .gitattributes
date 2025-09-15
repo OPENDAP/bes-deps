@@ -1,3 +1,4 @@
+*.tar.gz,*.tar.Z,*.tar.xz,*.tar.bz2,*.tgz filter=lfs diff=lfs merge=lfs -text
 *.gz filter=lfs diff=lfs merge=lfs -text
 *.Z filter=lfs diff=lfs merge=lfs -text
 *.bz2 filter=lfs diff=lfs merge=lfs -text
