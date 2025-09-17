@@ -1,4 +1,4 @@
-# Handwritten Makefile for the hyrax dependencies. Each dependency must be
+# Handwritten Makefile for the bes dependencies. Each dependency must be
 # configured, compiled and installed. Some support testing. Some do
 # not support parallel builds, with 'install' being particularly
 # problematic. 
@@ -31,7 +31,7 @@ site-deps =
 # I Removed the icu dependency because it is not needed for OSX anymore. jhrg 10/11/24
 .PHONY: $(deps)
 deps = $(site-deps) bison jpeg openjpeg gridfields hdf4 hdfeos hdf5 \
-netcdf4 sqlite3 proj gdal36 icu stare list-built
+netcdf4 sqlite3 proj gdal stare list-built
 
 # The 'all-static-deps' are the deps we need when all of the handlers are
 # to be statically linked to the dependencies contained in this project - 
@@ -45,7 +45,7 @@ netcdf4 sqlite3 proj gdal36 icu stare list-built
 # fits Removed 3/5/21 because it does not build static-only. jhrg 3/5/21
 .PHONY: $(linux_deps)
 linux_deps = $(site-deps) bison jpeg openjpeg gridfields hdf4	\
-hdfeos hdf5 netcdf4 sqlite3 proj gdal36 stare list-built
+hdfeos hdf5 netcdf4 sqlite3 proj gdal stare list-built
 
 # Removed lots of stuff because for Docker builds, we can use any decent
 # yum/rpm repo (e.g. EPEL). jhrg 8/18/21
@@ -161,7 +161,7 @@ ci-part-3:
 ci-part-4:
 	$(MAKE) $(MFLAGS) proj
 	$(MAKE) $(MFLAGS) openjpeg
-	$(MAKE) $(MFLAGS) gdal36
+	$(MAKE) $(MFLAGS) gdal
 
 clean: $(deps_clean)
 
@@ -190,7 +190,7 @@ bison_dist=$(bison).tar.xz
 jpeg=jpeg-6b
 jpeg_dist=jpegsrc.v6b.tar.gz
 
-openjpeg=openjpeg-2.4.0
+openjpeg=openjpeg-2.5.3
 openjpeg_dist=$(openjpeg).tar.gz
 
 sqlite3=sqlite-autoconf-3340000
@@ -202,11 +202,12 @@ sqlite3_dist=$(sqlite3).tar.gz
 #
 # Needed by GDAL, build and installed in a special directory under
 # $prefix and use it only with GDAL. jhrg 10/30/20
-proj=proj-9.1.0
+proj=proj-9.7.0
 proj_dist=$(proj).tar.gz
 
-gdal36=gdal-3.6.1
-gdal36_dist=$(gdal36).tar.gz
+# This is the last version of gdal that does not require c++-17. jhrg 9/17/25
+gdal=gdal-3.11.4
+gdal_dist=$(gdal).tar.gz
 
 gridfields=gridfields-1.0.5
 gridfields_dist=$(gridfields).tar.gz
@@ -322,22 +323,23 @@ $(openjpeg_src)-stamp:
 	echo timestamp > $(openjpeg_src)-stamp
 
 openjpeg-configure-stamp:  $(openjpeg_src)-stamp
-	(cd $(openjpeg_src) \
+	mkdir -p $(openjpeg_src)/build
+	(cd $(openjpeg_src)/build \
 	 && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=$(prefix)/deps \
-	 -DCMAKE_C_FLAGS="-fPIC -O2" -DBUILD_SHARED_LIBS:bool=OFF)
+	 -DCMAKE_C_FLAGS="-fPIC -O2" -DBUILD_SHARED_LIBS:bool=OFF ..)
 	echo timestamp > openjpeg-configure-stamp
 
 openjpeg-compile-stamp: openjpeg-configure-stamp
-	(cd $(openjpeg_src) && $(MAKE) $(MFLAGS))
+	(cd $(openjpeg_src)/build && $(MAKE) $(MFLAGS))
 	echo timestamp > openjpeg-compile-stamp
 
 openjpeg-install-stamp: openjpeg-compile-stamp
-	(cd $(openjpeg_src) && $(MAKE) $(MFLAGS) -j1 install)
+	(cd $(openjpeg_src)/build && $(MAKE) $(MFLAGS) -j1 install)
 	echo timestamp > openjpeg-install-stamp
 
 openjpeg-clean:
 	-rm openjpeg-*-stamp
-	-(cd  $(openjpeg_src) && $(MAKE) $(MFLAGS) clean)
+	-(cd  $(openjpeg_src)/build && $(MAKE) $(MFLAGS) clean)
 
 openjpeg-really-clean: openjpeg-clean
 	-rm $(src)/openjpeg-*-stamp	
@@ -390,7 +392,8 @@ $(proj_src)-stamp:
 	echo timestamp > $(proj_src)-stamp
 
 proj-configure-stamp: $(proj_src)-stamp
-	(cd $(proj_src) && mkdir build && cd build \
+	mkdir -p $(proj_src)/build
+	(cd $(proj_src)/build \
 	 && cmake -DCMAKE_INSTALL_PREFIX=$(proj_prefix) -DBUILD_SHARED_LIBS=OFF -DENABLE_TIFF=OFF ..)
 	echo timestamp > proj-configure-stamp
 
@@ -414,18 +417,18 @@ proj-really-clean: proj-clean
 proj: proj-install-stamp
 
 # GDAL
-gdal36_src=$(src)/$(gdal36)
-gdal36_prefix=$(prefix)/deps
+gdal_src=$(src)/$(gdal)
+gdal_prefix=$(prefix)/deps
 
-$(gdal36_src)-stamp:
-	tar -xzf downloads/$(gdal36_dist) -C $(src)
-	echo timestamp > $(gdal36_src)-stamp
+$(gdal_src)-stamp:
+	tar -xzf downloads/$(gdal_dist) -C $(src)
+	echo timestamp > $(gdal_src)-stamp
 
-# Set build options here (a few) and (most) in gdal36-config.cmake.
+# Set build options here (a few) and (most) in gdal-config.cmake.
 # jhrg 11/30/22
-gdal36-configure-stamp: $(gdal36_src)-stamp
-	(cd $(gdal36_src) \
-	 && mkdir build && cd build \
+gdal-configure-stamp: $(gdal_src)-stamp
+	mkdir -p $(gdal_src)/build
+	(cd $(gdal_src)/build \
 	 && cmake \
 	 -DPROJ_INCLUDE_DIR=$(proj_prefix)/include \
 	 -DPROJ_LIBRARY_RELEASE=$(proj_prefix)/lib/libproj.a \
@@ -433,26 +436,26 @@ gdal36-configure-stamp: $(gdal36_src)-stamp
 	 -DCMAKE_C_FLAGS="-fPIC -O2" \
 	 -DBUILD_SHARED_LIBS:bool=OFF \
 	 -C ../../../gdal-config.cmake ..)
-	echo timestamp > gdal36-configure-stamp
+	echo timestamp > gdal-configure-stamp
 
-gdal36-compile-stamp: gdal36-configure-stamp
-	(cd $(gdal36_src)/build && $(MAKE) $(MFLAGS))
-	echo timestamp > gdal36-compile-stamp
+gdal-compile-stamp: gdal-configure-stamp
+	(cd $(gdal_src)/build && $(MAKE) $(MFLAGS))
+	echo timestamp > gdal-compile-stamp
 
-gdal36-install-stamp: gdal36-compile-stamp
-	(cd $(gdal36_src)/build && $(MAKE) $(MFLAGS) -j1 install)
-	echo timestamp > gdal36-install-stamp
+gdal-install-stamp: gdal-compile-stamp
+	(cd $(gdal_src)/build && $(MAKE) $(MFLAGS) -j1 install)
+	echo timestamp > gdal-install-stamp
 
-gdal36-clean:
-	-rm gdal36-*-stamp
-	-(cd  $(gdal36_src)/build && $(MAKE) $(MFLAGS) clean)
+gdal-clean:
+	-rm gdal-*-stamp
+	-(cd  $(gdal_src)/build && $(MAKE) $(MFLAGS) clean)
 
-gdal36-really-clean: gdal36-clean
-	-rm $(gdal36_src)-stamp
-	-rm -rf $(gdal36_src)
+gdal-really-clean: gdal-clean
+	-rm $(gdal_src)-stamp
+	-rm -rf $(gdal_src)
 
-.PHONY: gdal36
-gdal36: gdal36-install-stamp
+.PHONY: gdal
+gdal: gdal-install-stamp
 
 # Gridfields 
 gridfields_src=$(src)/$(gridfields)
@@ -731,8 +734,8 @@ $(src)/$(stare)-stamp:
 
 stare-configure-stamp: $(src)/$(stare)-stamp
 	mkdir -p $(stare_src)/build
-	(cd $(stare_src)/build && cmake .. \
-		-DCMAKE_INSTALL_PREFIX:PATH=$(stare_prefix))
+	(cd $(stare_src)/build && cmake \
+		-DCMAKE_INSTALL_PREFIX:PATH=$(stare_prefix) -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..)
 	echo timestamp > stare-configure-stamp
 
 stare-compile-stamp: stare-configure-stamp
