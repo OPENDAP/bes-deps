@@ -17,7 +17,7 @@ libpng (you have to read over the GDAL configure output to learn
 this and that's painful, I know) then use the Makefile variable
 $(LIBPNG) to provide the base path for the libpng include and lib
 directories. You can do this by writing a file called 'hyrax-site.mk'
-in the directory that holds 'hyrax-dependencies' and putting
+in the directory that holds 'bes-deps' and putting
 '--with-png=/path/to/include-and-lib' in that file. Look at the
 top of the Makefile to see how hyrax-site.mk is included by the
 main Makefile. jhrg 5/8/23

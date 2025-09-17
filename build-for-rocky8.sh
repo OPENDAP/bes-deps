@@ -25,7 +25,7 @@ export LDFLAGS=-ltirpc
 
 # Assume that the docker container has been started with the cloned repo
 # mounted so it appears within 'root.'
-cd /root/hyrax-dependencies
+cd /root/bes-deps
 
 make -j16 sqlite3
 

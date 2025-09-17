@@ -171,15 +171,15 @@ uninstall: prefix-set
 	-rm -rf $(prefix)/deps/*
 
 dist: really-clean
-	(cd ../ && tar --create --file hyrax-dependencies-$(VERSION).tar \
+	(cd ../ && tar --create --file bes-deps-$(VERSION).tar \
 	 --exclude='.*' --exclude='*~'  --exclude=extra_downloads \
-	 --exclude=scripts --exclude=OSX_Resources hyrax-dependencies)
+	 --exclude=scripts --exclude=OSX_Resources bes-deps)
 
 install:
-	@echo "Nothing to do for install in hyrax-dependencies"
+	@echo "Nothing to do for install in bes-deps"
 
 check:
-	@echo "Nothing to do for check in hyrax-dependencies"
+	@echo "Nothing to do for check in bes-deps"
 
 # The names of the source code distribution files and and the dirs
 # they unpack to.
@@ -207,7 +207,8 @@ proj=proj-9.5.1
 proj_dist=$(proj).tar.gz
 
 # This is the last version of gdal that does not require c++-17. jhrg 9/17/25
-gdal=gdal-3.11.4
+# gdal=gdal-3.11.4
+gdal=gdal-3.9.3
 gdal_dist=$(gdal).tar.gz
 
 gridfields=gridfields-1.0.5
@@ -398,7 +399,8 @@ proj-configure-stamp: $(proj_src)-stamp
 	mkdir -p $(proj_src)/build
 	(cd $(proj_src)/build \
 	 && cmake -DCMAKE_INSTALL_PREFIX=$(proj_prefix) -DBUILD_SHARED_LIBS:bool=OFF \
-	 		  -DENABLE_TIFF:bool=OFF ..)
+	 		  -DENABLE_TIFF:bool=OFF -DSQLite3_INCLUDE_DIR=$(sqlite3_prefix)/include \
+	 		  -DSQLite3_LIBRARY=$(sqlite3_prefix)/lib ..)
 	echo timestamp > proj-configure-stamp
 
 proj-compile-stamp: proj-configure-stamp

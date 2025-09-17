@@ -1,5 +1,5 @@
 
-# Build the hyrax-dependencies repo and snapshot that build if it works. This also builds
+# Build the bes-deps repo and snapshot that build if it works. This also builds
 # static versions of the dependencies for use with the rpm builds of the BES.
 #
 # jhrg 2/23/18
@@ -49,6 +49,7 @@ env:
   global:
     # These keys are used to upload the build artifacts to S3. jhrg 1/19/24
     # AWS_ACCESS_KEY_ID (user: travis-hyrax-dependencies)
+    # At some point, we might update this user to travis-bes-deps. jhrg 9/17/25
     - secure: "KDHpyQLB4nARPv/k4wUjgl6OD3jLMRifRwX58YFESvbU4IGB1pKS6sV0h4p5grdBBLikLYF7S61a2HhZ3b0zYADWzNEsDNwS3HDlhqVGVv53uanUy+6yTR7igkclh8zqw1dxzM9rbHtxB9TPIhq+gI0KpXXfMf+eP26SEuaiAWs="
     # AWS_SECRET_ACCESS_KEY
     - secure: "hEaItJDLc8Qrq6U2eZBVjpZKRDsCe2wSBjGA46mPkHsmeKFjP/1lG5qZ2+DdmC3+2/ZgM4iIRpTE6cqTaIjrd+6E6b8Dkgxwu1aQlEJRkuxbOJqyHrgjCob23Xq5ieXa+rS7TlDIdnYJnS8uCWWCr+cuZw8cMVUaqu1uNLY0EZQ="
@@ -79,8 +80,8 @@ jobs:
       - install_dir=$HOME/rocky8/install
       - mkdir -p $install_dir
       - docker run --env prefix=/root/install --volume $install_dir:/root/install 
-          --volume $TRAVIS_BUILD_DIR:/root/hyrax-dependencies opendap/rocky8_hyrax_builder:latest 
-          /root/hyrax-dependencies/build-for-rocky8.sh
+          --volume $TRAVIS_BUILD_DIR:/root/bes-deps opendap/rocky8_hyrax_builder:latest 
+          /root/bes-deps/build-for-rocky8.sh
       - export ARTIFACT=rocky8
 
 # The before_deploy and deploy parts are run after every 'build' script completes. This section
@@ -89,10 +90,10 @@ jobs:
 before_deploy:
   - mkdir -p $TRAVIS_BUILD_DIR/package
   - if test -n $ARTIFACT -a $ARTIFACT = ubuntu;
-    then tar -C $HOME -czvf $TRAVIS_BUILD_DIR/package/hyrax-dependencies-build.tar.gz install;
+    then tar -C $HOME -czvf $TRAVIS_BUILD_DIR/package/bes-deps-build.tar.gz install;
     fi
   - if test -n $ARTIFACT -a $ARTIFACT = rocky8;
-    then tar -C $HOME/rocky8/ -czvf $TRAVIS_BUILD_DIR/package/hyrax-dependencies-rocky8-static.tar.gz install;
+    then tar -C $HOME/rocky8/ -czvf $TRAVIS_BUILD_DIR/package/bes-deps-rocky8-static.tar.gz install;
     fi
 
 deploy:
