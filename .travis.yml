@@ -31,8 +31,8 @@ compiler: gcc
 
 branches:
   only:
-    # - master
-    # - main
+    - master
+    - main
     - /^(.*-test-deploy)$/
 
 addons:
