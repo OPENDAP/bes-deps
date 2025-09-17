@@ -202,7 +202,8 @@ sqlite3_dist=$(sqlite3).tar.gz
 #
 # Needed by GDAL, build and installed in a special directory under
 # $prefix and use it only with GDAL. jhrg 10/30/20
-proj=proj-9.7.0
+# proj=proj-9.7.0
+proj=proj-9.1.1
 proj_dist=$(proj).tar.gz
 
 # This is the last version of gdal that does not require c++-17. jhrg 9/17/25
@@ -382,7 +383,7 @@ sqlite3: sqlite3-install-stamp
 # proj6 Make a special directory for this since HDFEOS also installs
 # a 'proj.h' header and the hdf4 handler needs to find it. In the
 # future, invert this, making HDFEOS use the special install. The
-# hdf4 handler will have to be modifed to use a special set of de-
+# hdf4 handler will have to be modified to use a special set of de-
 # pendencies. jhrg 10/29/20
 proj_src=$(src)/$(proj)
 proj_prefix=$(prefix)/deps/proj
@@ -394,7 +395,8 @@ $(proj_src)-stamp:
 proj-configure-stamp: $(proj_src)-stamp
 	mkdir -p $(proj_src)/build
 	(cd $(proj_src)/build \
-	 && cmake -DCMAKE_INSTALL_PREFIX=$(proj_prefix) -DBUILD_SHARED_LIBS=OFF -DENABLE_TIFF=OFF ..)
+	 && cmake -DCMAKE_INSTALL_PREFIX=$(proj_prefix) -DBUILD_SHARED_LIBS:bool=OFF \
+	 		  -DENABLE_TIFF:bool=OFF ..)
 	echo timestamp > proj-configure-stamp
 
 proj-compile-stamp: proj-configure-stamp
