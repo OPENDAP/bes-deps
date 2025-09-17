@@ -203,7 +203,7 @@ sqlite3_dist=$(sqlite3).tar.gz
 # Needed by GDAL, build and installed in a special directory under
 # $prefix and use it only with GDAL. jhrg 10/30/20
 # proj=proj-9.7.0
-proj=proj-9.1.1
+proj=proj-9.5.1
 proj_dist=$(proj).tar.gz
 
 # This is the last version of gdal that does not require c++-17. jhrg 9/17/25
@@ -391,6 +391,8 @@ proj_prefix=$(prefix)/deps/proj
 $(proj_src)-stamp:
 	tar -xzf downloads/$(proj_dist) -C $(src)
 	echo timestamp > $(proj_src)-stamp
+
+# -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
 proj-configure-stamp: $(proj_src)-stamp
 	mkdir -p $(proj_src)/build
