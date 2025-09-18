@@ -3,7 +3,20 @@ Short version: 'make <os>' builds and installs the dependencies for the BES
 
 You must use GitHub's LFS (Large File Storage) with this repo.
 
---------------------------------------------------------------------
+# Building on Rocky8 (very similar to RHEL 8)
+
+The repo should build on a Rocky8 machine with a decent build environment.
+Here's where to find information about that:[Rocky8 build](https://docs.opendap.org/index.php/Hyrax_GitHub_Source_Build#Configuring_Rocky8)
+
+# Building on Ubuntu Focal (20.c)
+
+You will need the following packages, in addition to the nominal C++ tools:
+uuid-dev, libxml2-dev, libcurl4-openssl-dev, libcppunit-dev, libicu-dev,
+libwebp-dev, libzstd-dev
+
+----
+
+# Background
 
 To build the dependencies for the BES handlers used
 with Hyrax, run 'make' in this directory. The Makefile requires that
