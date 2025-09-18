@@ -399,8 +399,7 @@ proj-configure-stamp: $(proj_src)-stamp
 	mkdir -p $(proj_src)/build
 	(cd $(proj_src)/build \
 	 && cmake -DCMAKE_INSTALL_PREFIX=$(proj_prefix) -DBUILD_SHARED_LIBS:bool=OFF \
-	 		  -DENABLE_TIFF:bool=OFF -DSQLite3_INCLUDE_DIR=$(sqlite3_prefix)/include \
-	 		  -DSQLite3_LIBRARY=$(sqlite3_prefix)/lib ..)
+	 		  -DENABLE_TIFF:bool=OFF -DCMAKE_PREFIX_PATH=$(prefix)/deps ..)
 	echo timestamp > proj-configure-stamp
 
 proj-compile-stamp: proj-configure-stamp
