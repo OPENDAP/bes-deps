@@ -43,7 +43,9 @@ addons:
       - libcurl4-openssl-dev
       - libcppunit-dev
       - libicu-dev
-      - libsqlite3-dev
+      - libwebp-dev
+      - libzstd-dev
+      # - libsqlite3-dev
 
 env:
   global:
