@@ -112,7 +112,8 @@ list-built-really-clean:
 # it. jhrg 11/29/17.
 for-static-rpm: prefix-set
 	for d in $(linux_deps); \
-	    do CONFIGURE_FLAGS="--disable-shared" $(MAKE) $(MFLAGS) $$d; done
+	    do CONFIGURE_FLAGS="--disable-shared" CMAKE_FLAGS="-DBUILD_SHARED_LIBS:bool=OFF" \
+	    	$(MAKE) $(MFLAGS) $$d; done
 
 # Made this build statically since these are now used for the deb packages.
 for-travis: prefix-set
@@ -152,13 +153,18 @@ ci-part-1:
 ci-part-2:
 	$(MAKE) $(MFLAGS) jpeg
 	$(MAKE) $(MFLAGS) hdf4
-
-ci-part-3:
 	$(MAKE) $(MFLAGS) hdfeos
 	$(MAKE) $(MFLAGS) hdf5
 	$(MAKE) $(MFLAGS) netcdf4
 
-ci-part-4:
+
+#ci-part-3:
+#	$(MAKE) $(MFLAGS) hdfeos
+#	$(MAKE) $(MFLAGS) hdf5
+#	$(MAKE) $(MFLAGS) netcdf4
+
+ci-part-3:
+	$(MAKE) $(MFLAGS) sqlite3
 	$(MAKE) $(MFLAGS) proj
 	$(MAKE) $(MFLAGS) openjpeg
 	$(MAKE) $(MFLAGS) gdal
@@ -328,7 +334,7 @@ openjpeg-configure-stamp:  $(openjpeg_src)-stamp
 	mkdir -p $(openjpeg_src)/build
 	(cd $(openjpeg_src)/build \
 	 && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=$(prefix)/deps \
-	 -DCMAKE_C_FLAGS="-fPIC -O2" -DBUILD_SHARED_LIBS:bool=OFF ..)
+	 -DCMAKE_C_FLAGS="-fPIC -O2" $(CMAKE_FLAGS) ..)
 	echo timestamp > openjpeg-configure-stamp
 
 openjpeg-compile-stamp: openjpeg-configure-stamp
@@ -398,7 +404,7 @@ $(proj_src)-stamp:
 proj-configure-stamp: $(proj_src)-stamp
 	mkdir -p $(proj_src)/build
 	(cd $(proj_src)/build \
-	 && cmake -DCMAKE_INSTALL_PREFIX=$(proj_prefix) -DBUILD_SHARED_LIBS:bool=OFF \
+	 && cmake -DCMAKE_INSTALL_PREFIX=$(proj_prefix) $(CMAKE_FLAGS) \
 	 		  -DENABLE_TIFF:bool=OFF -DCMAKE_PREFIX_PATH=$(prefix)/deps ..)
 	echo timestamp > proj-configure-stamp
 
@@ -439,7 +445,7 @@ gdal-configure-stamp: $(gdal_src)-stamp
 	 -DPROJ_LIBRARY_RELEASE=$(proj_prefix)/lib/libproj.a \
 	 -DCMAKE_INSTALL_PREFIX:PATH=$(prefix)/deps \
 	 -DCMAKE_C_FLAGS="-fPIC -O2" \
-	 -DBUILD_SHARED_LIBS:bool=OFF \
+	 $(CMAKE_FLAGS) \
 	 -C ../../../gdal-config.cmake ..)
 	echo timestamp > gdal-configure-stamp
 
@@ -740,7 +746,8 @@ $(src)/$(stare)-stamp:
 stare-configure-stamp: $(src)/$(stare)-stamp
 	mkdir -p $(stare_src)/build
 	(cd $(stare_src)/build && cmake \
-		-DCMAKE_INSTALL_PREFIX:PATH=$(stare_prefix) -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..)
+		-DCMAKE_INSTALL_PREFIX:PATH=$(stare_prefix) $(CMAKE_FLAGS) \
+		-DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..)
 	echo timestamp > stare-configure-stamp
 
 stare-compile-stamp: stare-configure-stamp
