@@ -152,13 +152,18 @@ ci-part-1:
 ci-part-2:
 	$(MAKE) $(MFLAGS) jpeg
 	$(MAKE) $(MFLAGS) hdf4
-
-ci-part-3:
 	$(MAKE) $(MFLAGS) hdfeos
 	$(MAKE) $(MFLAGS) hdf5
 	$(MAKE) $(MFLAGS) netcdf4
 
-ci-part-4:
+
+#ci-part-3:
+#	$(MAKE) $(MFLAGS) hdfeos
+#	$(MAKE) $(MFLAGS) hdf5
+#	$(MAKE) $(MFLAGS) netcdf4
+
+ci-part-3:
+	$(MAKE) $(MFLAGS) sqlite3
 	$(MAKE) $(MFLAGS) proj
 	$(MAKE) $(MFLAGS) openjpeg
 	$(MAKE) $(MFLAGS) gdal

@@ -27,10 +27,10 @@ export LDFLAGS=-ltirpc
 # mounted so it appears within 'root.'
 cd /root/bes-deps
 
-make -j16 sqlite3
+# make -j16 sqlite3
 
 make -j16 ci-part-1
 make -j16 ci-part-2
 make -j16 ci-part-3
-make -j16 ci-part-4
+# make -j16 ci-part-4
 make list-built
