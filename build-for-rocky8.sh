@@ -23,6 +23,8 @@ export CONFIGURE_FLAGS="--disable-shared"
 export CPPFLAGS=-I/usr/include/tirpc
 export LDFLAGS=-ltirpc
 
+export CMAKE_FLAGS="-DBUILD_SHARED_LIBS:bool=OFF"
+
 # Assume that the docker container has been started with the cloned repo
 # mounted so it appears within 'root.'
 cd /root/bes-deps
