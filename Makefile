@@ -157,12 +157,6 @@ ci-part-2:
 	$(MAKE) $(MFLAGS) hdf5
 	$(MAKE) $(MFLAGS) netcdf4
 
-
-#ci-part-3:
-#	$(MAKE) $(MFLAGS) hdfeos
-#	$(MAKE) $(MFLAGS) hdf5
-#	$(MAKE) $(MFLAGS) netcdf4
-
 ci-part-3:
 	$(MAKE) $(MFLAGS) sqlite3
 	$(MAKE) $(MFLAGS) proj
@@ -208,12 +202,12 @@ sqlite3_dist=$(sqlite3).tar.gz
 #
 # Needed by GDAL, build and installed in a special directory under
 # $prefix and use it only with GDAL. jhrg 10/30/20
-# proj=proj-9.7.0
+# proj=proj-9.7.0 - requires C++-17. jhrg 9/19/25
 proj=proj-9.5.1
 proj_dist=$(proj).tar.gz
 
-# This is the last version of gdal that does not require c++-17. jhrg 9/17/25
-# gdal=gdal-3.11.4
+# This (3.9.3) is the last version of gdal that does not require c++-17. jhrg 9/17/25
+# gdal=gdal-3.11.4 - requires C++-17. jhrg 9/19/25
 gdal=gdal-3.9.3
 gdal_dist=$(gdal).tar.gz
 
@@ -225,7 +219,7 @@ hdf4_dist=$(hdf4).tar.gz
 
 hdfeos=hdfeos
 hdfeos_dist=HDF-EOS2.19v1.00.tar.Z
-# This version of HDF-EOS for HDF4 is broken. jhrg 5/7/23
+# This (20v1) version of HDF-EOS for HDF4 is broken. jhrg 5/7/23
 # hdfeos_dist=HDF-EOS2.20v1.00.tar.Z
 
 hdf5=hdf5-1.10.10
@@ -392,14 +386,13 @@ sqlite3: sqlite3-install-stamp
 # future, invert this, making HDFEOS use the special install. The
 # hdf4 handler will have to be modified to use a special set of de-
 # pendencies. jhrg 10/29/20
+# Moved to proj 9.x - jhrg 9/19/25
 proj_src=$(src)/$(proj)
 proj_prefix=$(prefix)/deps/proj
 
 $(proj_src)-stamp:
 	tar -xzf downloads/$(proj_dist) -C $(src)
 	echo timestamp > $(proj_src)-stamp
-
-# -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
 proj-configure-stamp: $(proj_src)-stamp
 	mkdir -p $(proj_src)/build
